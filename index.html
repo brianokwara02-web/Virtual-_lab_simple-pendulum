@@ -1,0 +1,2489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Virtual Physics Lab | Simple Pendulum - Meru University</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ----- ORIGINAL STYLE – COMPLETELY UNCHANGED (only viewport & minor responsive viewer additions at very end) ----- */
+        :root {
+            --mu-primary: #006633;
+            --mu-secondary: #FFCC00;
+            --mu-light: #F8FCFA;
+            --mu-white: #FFFFFF;
+            --mu-dark: #004d26;
+            --mu-gray: #5D6D7E;
+            --mu-light-gray: #EAEDF2;
+            --shadow: 0 8px 30px rgba(0, 102, 51, 0.08);
+            --shadow-hover: 0 15px 40px rgba(0, 102, 51, 0.12);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fcf9 0%, #f0f7f3 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles - Responsive */
+        .header {
+            background: linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-dark) 100%);
+            color: var(--mu-white);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--mu-secondary) 0%, #FFD700 50%, var(--mu-secondary) 100%);
+        }
+        
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .header-content {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
+        .university-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .university-brand {
+                flex-direction: row;
+                text-align: left;
+                gap: 1.5rem;
+            }
+        }
+        
+        /* Updated Logo Container */
+        .logo-container {
+            width: 80px;
+            height: 80px;
+            background: var(--mu-white);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border: 3px solid var(--mu-secondary);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .logo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 480px) {
+            .logo-container {
+                width: 70px;
+                height: 70px;
+            }
+        }
+        
+        .logo-main {
+            font-size: 13px;
+            line-height: 1.2;
+        }
+        
+        .logo-sub {
+            font-size: 8px;
+            color: var(--mu-gray);
+            margin-top: 2px;
+        }
+        
+        .university-info h1 {
+            color: var(--mu-white);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        
+        @media (max-width: 767px) {
+            .university-info h1 {
+                font-size: 1.2rem;
+                text-align: center;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .university-info h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        .university-info .tagline {
+            color: var(--mu-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 767px) {
+            .university-info .tagline {
+                text-align: center;
+            }
+        }
+        
+        /* Special yellow text for creator credit */
+        .creator-credit {
+            color: var(--mu-secondary) !important;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+        
+        @media (max-width: 767px) {
+            .creator-credit {
+                font-size: 0.8rem;
+                margin-top: 0.8rem;
+                order: 3;
+                width: 100%;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .creator-credit {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                white-space: nowrap;
+            }
+        }
+        
+        .experiment-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            border-radius: 10px;
+            padding: 0.8rem 1.2rem;
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        @media (max-width: 767px) {
+            .experiment-badge {
+                margin-top: 1rem;
+                max-width: 100%;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .experiment-badge {
+                width: auto;
+            }
+        }
+        
+        .experiment-badge h3 {
+            color: var(--mu-white);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        
+        .experiment-badge p {
+            color: var(--mu-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        /* Manual Download Section Styles */
+        .manual-download-section {
+            margin: 2rem auto;
+            text-align: center;
+            max-width: 800px;
+        }
+        
+        .manual-download-card {
+            background: linear-gradient(135deg, var(--mu-white) 0%, var(--mu-light) 100%);
+            border-radius: 18px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 2px solid rgba(0, 102, 51, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .manual-download-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--mu-primary) 0%, var(--mu-secondary) 100%);
+        }
+        
+        .manual-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .manual-header {
+                flex-direction: row;
+                justify-content: center;
+                gap: 1.5rem;
+            }
+        }
+        
+        .manual-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--mu-white);
+            font-size: 28px;
+            border: 4px solid var(--mu-secondary);
+            box-shadow: 0 8px 20px rgba(0, 102, 51, 0.2);
+        }
+        
+        .manual-title {
+            color: var(--mu-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        @media (min-width: 768px) {
+            .manual-title {
+                text-align: left;
+                font-size: 1.8rem;
+            }
+        }
+        
+        .manual-description {
+            color: var(--mu-gray);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .download-btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-dark) 100%);
+            color: var(--mu-white);
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            box-shadow: 0 8px 20px rgba(0, 102, 51, 0.2);
+        }
+        
+        .download-btn:hover {
+            background: linear-gradient(135deg, var(--mu-dark) 0%, #003d1a 100%);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .download-btn i {
+            font-size: 1.2rem;
+        }
+        
+        .manual-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--mu-light-gray);
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            padding: 0.5rem;
+        }
+        
+        .feature-icon {
+            color: var(--mu-primary);
+            background: rgba(0, 102, 51, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .feature-text h4 {
+            color: var(--mu-primary);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        
+        .feature-text p {
+            color: var(--mu-gray);
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        
+        /* Page Title - Responsive */
+        .page-title {
+            padding: 2.5rem 0 2rem;
+            text-align: center;
+        }
+        
+        @media (max-width: 767px) {
+            .page-title {
+                padding: 1.5rem 0 1rem;
+            }
+        }
+        
+        .page-title h2 {
+            color: var(--mu-primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        @media (max-width: 767px) {
+            .page-title h2 {
+                font-size: 1.4rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .page-title h2 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        .page-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--mu-primary) 0%, var(--mu-secondary) 100%);
+            border-radius: 2px;
+        }
+        
+        .page-title p {
+            color: var(--mu-gray);
+            max-width: 750px;
+            margin: 1.5rem auto 0;
+            font-size: 1rem;
+            line-height: 1.6;
+            padding: 0 1rem;
+        }
+        
+        @media (max-width: 767px) {
+            .page-title p {
+                font-size: 0.9rem;
+                padding: 0 0.5rem;
+            }
+        }
+        
+        /* Dashboard Layout - Responsive */
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        @media (min-width: 1024px) {
+            .dashboard {
+                display: grid;
+                grid-template-columns: 1fr 1.7fr;
+                gap: 2rem;
+            }
+        }
+        
+        /* Control Panel - Responsive */
+        .control-panel {
+            background: var(--mu-white);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 102, 51, 0.1);
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        @media (max-width: 767px) {
+            .control-panel {
+                padding: 1.2rem;
+                border-radius: 12px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .control-panel {
+                padding: 2rem;
+            }
+        }
+        
+        .control-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--mu-primary) 0%, var(--mu-secondary) 100%);
+            border-radius: 18px 18px 0 0;
+        }
+        
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--mu-light-gray);
+        }
+        
+        @media (max-width: 480px) {
+            .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+        
+        .panel-header h3 {
+            color: var(--mu-primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        @media (max-width: 767px) {
+            .panel-header h3 {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .panel-header h3 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .panel-header h3 i {
+            color: var(--mu-secondary);
+            background: rgba(255, 204, 0, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @media (max-width: 480px) {
+            .panel-header h3 i {
+                width: 35px;
+                height: 35px;
+            }
+        }
+        
+        /* Part Selector - Responsive */
+        .part-selector {
+            margin-bottom: 2rem;
+        }
+        
+        .part-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        
+        @media (min-width: 480px) {
+            .part-buttons {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .part-buttons {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+        
+        .part-btn {
+            padding: 1rem 0.8rem;
+            background: var(--mu-light);
+            border: 2px solid var(--mu-light-gray);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--mu-primary);
+            transition: var(--transition);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        @media (max-width: 480px) {
+            .part-btn {
+                padding: 0.8rem 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        .part-btn.active {
+            background: linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-dark) 100%);
+            color: var(--mu-white);
+            border-color: var(--mu-primary);
+        }
+        
+        .part-btn i {
+            font-size: 1.2rem;
+        }
+        
+        /* Parameter Selector - Responsive */
+        .parameter-selector {
+            margin-bottom: 2rem;
+            background: var(--mu-light);
+            border-radius: 14px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 102, 51, 0.08);
+        }
+        
+        @media (max-width: 480px) {
+            .parameter-selector {
+                padding: 1rem;
+                border-radius: 10px;
+            }
+        }
+        
+        .selector-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 480px) {
+            .selector-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+        
+        .selector-title h4 {
+            color: var(--mu-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 480px) {
+            .selector-title h4 {
+                font-size: 1rem;
+            }
+        }
+        
+        .selector-title i {
+            color: var(--mu-secondary);
+            background: rgba(255, 204, 0, 0.1);
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .selector-description {
+            color: var(--mu-gray);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .parameter-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+        }
+        
+        @media (min-width: 768px) {
+            .parameter-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .param-btn {
+            padding: 0.8rem 0.5rem;
+            background: var(--mu-white);
+            border: 2px solid var(--mu-light-gray);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            color: var(--mu-primary);
+            text-align: center;
+        }
+        
+        @media (max-width: 480px) {
+            .param-btn {
+                padding: 0.6rem 0.3rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        .param-btn.active {
+            background: linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-dark) 100%);
+            color: var(--mu-white);
+            border-color: var(--mu-primary);
+        }
+        
+        /* Current Setup Card - Responsive */
+        .setup-card {
+            background: linear-gradient(135deg, #f8fcf9 0%, #e8f4ee 100%);
+            border-radius: 14px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 102, 51, 0.1);
+            margin-top: 1.5rem;
+        }
+        
+        @media (max-width: 480px) {
+            .setup-card {
+                padding: 1rem;
+                border-radius: 10px;
+            }
+        }
+        
+        .setup-card h4 {
+            color: var(--mu-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        @media (max-width: 480px) {
+            .setup-card h4 {
+                font-size: 1rem;
+            }
+        }
+        
+        .parameter-display {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        @media (max-width: 480px) {
+            .parameter-display {
+                gap: 0.8rem;
+            }
+        }
+        
+        @media (min-width: 480px) {
+            .parameter-display {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .param-display-item {
+            background: var(--mu-white);
+            border-radius: 10px;
+            padding: 1rem;
+            border: 1px solid rgba(0, 102, 51, 0.08);
+        }
+        
+        @media (max-width: 480px) {
+            .param-display-item {
+                padding: 0.8rem;
+            }
+        }
+        
+        .param-label {
+            color: var(--mu-gray);
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        @media (max-width: 480px) {
+            .param-label {
+                font-size: 0.7rem;
+            }
+        }
+        
+        .param-value {
+            color: var(--mu-primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        @media (max-width: 480px) {
+            .param-value {
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* Video Panel - Responsive */
+        .video-panel {
+            background: var(--mu-white);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid rgba(0, 102, 51, 0.1);
+        }
+        
+        @media (max-width: 767px) {
+            .video-panel {
+                border-radius: 12px;
+            }
+        }
+        
+        .video-header {
+            background: linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-dark) 100%);
+            color: var(--mu-white);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        @media (max-width: 767px) {
+            .video-header {
+                padding: 1rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .video-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
+        .video-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        @media (max-width: 767px) {
+            .video-header h3 {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .video-header h3 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .video-header h3 i {
+            color: var(--mu-secondary);
+            background: rgba(255, 255, 255, 0.15);
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @media (max-width: 480px) {
+            .video-header h3 i {
+                width: 35px;
+                height: 35px;
+            }
+        }
+        
+        .experiment-indicator {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            text-align: center;
+        }
+        
+        @media (max-width: 767px) {
+            .experiment-indicator {
+                font-size: 0.8rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+        
+        .video-container {
+            padding: 1.5rem;
+        }
+        
+        @media (max-width: 767px) {
+            .video-container {
+                padding: 1rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .video-container {
+                padding: 2rem;
+            }
+        }
+        
+        /* Video Player Container - Fully Responsive */
+        .video-player-container {
+            background: #000;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+        }
+        
+        @media (max-width: 767px) {
+            .video-player-container {
+                border-radius: 10px;
+                margin-bottom: 1rem;
+            }
+        }
+        
+        .video-player {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .video-info {
+            background: linear-gradient(135deg, #f8fcf9 0%, #f0f7f3 100%);
+            border-radius: 14px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 102, 51, 0.1);
+        }
+        
+        @media (max-width: 767px) {
+            .video-info {
+                padding: 1rem;
+                border-radius: 10px;
+            }
+        }
+        
+        .video-info h4 {
+            color: var(--mu-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        @media (max-width: 480px) {
+            .video-info h4 {
+                font-size: 1rem;
+            }
+        }
+        
+        .video-info p {
+            color: var(--mu-gray);
+            line-height: 1.5;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Data Section - Responsive */
+        .data-section {
+            background: var(--mu-white);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(0, 102, 51, 0.1);
+        }
+        
+        @media (max-width: 767px) {
+            .data-section {
+                padding: 1.2rem;
+                margin-top: 1.5rem;
+                border-radius: 12px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .data-section {
+                padding: 2rem;
+            }
+        }
+        
+        .data-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--mu-light-gray);
+        }
+        
+        @media (max-width: 767px) {
+            .data-header {
+                margin-bottom: 1rem;
+                padding-bottom: 0.8rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .data-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
+        .data-header h3 {
+            color: var(--mu-primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        @media (max-width: 767px) {
+            .data-header h3 {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .data-header h3 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .data-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 480px) {
+            .data-tabs {
+                justify-content: center;
+            }
+        }
+        
+        .data-tab {
+            padding: 0.6rem 1.2rem;
+            background: var(--mu-light);
+            border: 2px solid var(--mu-light-gray);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--mu-primary);
+            transition: var(--transition);
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        
+        @media (max-width: 480px) {
+            .data-tab {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+        
+        .data-tab.active {
+            background: linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-dark) 100%);
+            color: var(--mu-white);
+            border-color: var(--mu-primary);
+        }
+        
+        .data-table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--mu-light-gray);
+            margin: 0 auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        @media (max-width: 767px) {
+            .data-table-container {
+                border-radius: 8px;
+                margin: 0 -0.5rem;
+                width: calc(100% + 1rem);
+            }
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+        
+        @media (max-width: 767px) {
+            .data-table {
+                min-width: 600px;
+            }
+        }
+        
+        .data-table thead {
+            background: linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-dark) 100%);
+        }
+        
+        .data-table th {
+            color: var(--mu-white);
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 480px) {
+            .data-table th {
+                padding: 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+        
+        .data-table td {
+            padding: 1rem;
+            color: var(--mu-gray);
+            border-bottom: 1px solid var(--mu-light-gray);
+        }
+        
+        @media (max-width: 480px) {
+            .data-table td {
+                padding: 0.8rem;
+            }
+        }
+        
+        .data-table input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--mu-light-gray);
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        @media (max-width: 480px) {
+            .data-table input {
+                padding: 0.4rem;
+                font-size: 0.8rem;
+            }
+        }
+        
+        .data-instructions {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8fcf9 0%, #f0f7f3 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 102, 51, 0.1);
+        }
+        
+        @media (max-width: 767px) {
+            .data-instructions {
+                padding: 1rem;
+                margin-top: 1rem;
+                border-radius: 10px;
+            }
+        }
+        
+        .data-instructions h4 {
+            color: var(--mu-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        @media (max-width: 480px) {
+            .data-instructions h4 {
+                font-size: 1rem;
+            }
+        }
+        
+        .data-instructions ul {
+            color: var(--mu-gray);
+            padding-left: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 480px) {
+            .data-instructions ul {
+                font-size: 0.85rem;
+                padding-left: 1rem;
+            }
+        }
+        
+        .data-instructions li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Questions Section - Responsive */
+        .questions-section {
+            background: var(--mu-white);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(0, 102, 51, 0.1);
+        }
+        
+        @media (max-width: 767px) {
+            .questions-section {
+                padding: 1.2rem;
+                margin-top: 1.5rem;
+                border-radius: 12px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .questions-section {
+                padding: 2rem;
+            }
+        }
+        
+        .questions-header {
+            color: var(--mu-primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        @media (max-width: 767px) {
+            .questions-header {
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .questions-header {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .questions-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .questions-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .question-item {
+            background: linear-gradient(135deg, #f8fcf9 0%, #f0f7f3 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 102, 51, 0.1);
+        }
+        
+        @media (max-width: 767px) {
+            .question-item {
+                padding: 1rem;
+                border-radius: 10px;
+            }
+        }
+        
+        .question-item h4 {
+            color: var(--mu-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        @media (max-width: 480px) {
+            .question-item h4 {
+                font-size: 0.9rem;
+                margin-bottom: 0.8rem;
+            }
+        }
+        
+        .question-item textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--mu-light-gray);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        @media (max-width: 480px) {
+            .question-item textarea {
+                padding: 0.6rem;
+                font-size: 0.85rem;
+                min-height: 60px;
+            }
+        }
+        
+        /* Footer - Responsive */
+        .footer {
+            background: linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-dark) 100%);
+            color: var(--mu-white);
+            padding: 2.5rem 0 2rem;
+            margin-top: 3rem;
+            position: relative;
+        }
+        
+        @media (max-width: 767px) {
+            .footer {
+                padding: 1.5rem 0 1rem;
+                margin-top: 2rem;
+            }
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--mu-secondary) 0%, #FFD700 50%, var(--mu-secondary) 100%);
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            text-align: center;
+        }
+        
+        @media (max-width: 767px) {
+            .footer-content {
+                gap: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .footer-content {
+                grid-template-columns: repeat(3, 1fr);
+                text-align: left;
+            }
+        }
+        
+        .footer-section h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--mu-secondary);
+        }
+        
+        @media (max-width: 767px) {
+            .footer-section h4 {
+                font-size: 1rem;
+            }
+        }
+        
+        .footer-section p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 767px) {
+            .footer-section p {
+                font-size: 0.85rem;
+            }
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 767px) {
+            .copyright {
+                padding-top: 1.5rem;
+                margin-top: 1.5rem;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Mobile-specific adjustments */
+        @media (max-width: 767px) {
+            .dashboard-badge-text {
+                font-size: 0.9rem;
+            }
+            
+            .header-content > p {
+                text-align: center;
+                font-size: 0.8rem;
+                margin-top: 0.5rem;
+            }
+        }
+        
+        /* Modal Styles for Apparatus View */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--mu-white);
+            border-radius: 20px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-dark) 100%);
+            color: var(--mu-white);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .close-modal {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: var(--mu-white);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.2rem;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            max-height: calc(90vh - 100px);
+        }
+        
+        /* Apparatus Gallery Styles */
+        .apparatus-main-image {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            border: 3px solid var(--mu-light-gray);
+        }
+        
+        .apparatus-main-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .apparatus-info {
+            background: linear-gradient(135deg, #f8fcf9 0%, #f0f7f3 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 102, 51, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .apparatus-info h4 {
+            color: var(--mu-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .apparatus-info ul {
+            color: var(--mu-gray);
+            padding-left: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .apparatus-info li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .apparatus-components {
+            background: linear-gradient(135deg, var(--mu-light) 0%, #e8f4ee 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 102, 51, 0.1);
+        }
+        
+        .apparatus-components h4 {
+            color: var(--mu-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .component-item {
+            background: var(--mu-white);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid rgba(0, 102, 51, 0.08);
+        }
+        
+        .component-item h5 {
+            color: var(--mu-primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .component-item p {
+            color: var(--mu-gray);
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        
+        /* Responsive modal adjustments */
+        @media (max-width: 768px) {
+            .modal-content {
+                max-width: 95%;
+                border-radius: 15px;
+            }
+            
+            .modal-header {
+                padding: 1rem 1.5rem;
+            }
+            
+            .modal-body {
+                padding: 1.5rem;
+            }
+            
+            .modal-header h3 {
+                font-size: 1.1rem;
+            }
+            
+            .components-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .apparatus-main-image {
+                border-radius: 8px;
+            }
+            
+            .apparatus-info, .apparatus-components {
+                padding: 1rem;
+            }
+        }
+        
+        /* --- ADDITION: NO STYLE CHANGE – ONLY RESPONSIVE VIEWER ENHANCEMENTS (keep everything intact) --- */
+        /* extra tiny touches for better responsive viewer: ensure pinch zoom, never clip content, maintain layout */
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+        video, iframe, embed, object {
+            max-width: 100%;
+        }
+        .video-player-container iframe {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .video-player-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .video-player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        /* fix for any overflow due to padding */
+        .container, .header-content, .dashboard, .data-table-container, .modal-content {
+            word-wrap: break-word;
+        }
+        /* no style changes, only ensure that the responsive viewer works without horizontal scroll */
+    </style>
+</head>
+<body>
+    <!-- Main Page (No Login Required) -->
+    <header class="header">
+        <div class="container header-content">
+            <div class="university-brand">
+                <div class="logo-container">
+                    <img src="images/LOGO.jpeg" alt="Meru University Logo" class="logo-image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22><rect width=%22100%%22 height=%22100%%22 fill=%22%23006633%22/><text x=%2240%22 y=%2245%22 text-anchor=%22middle%22 fill=%22%23FFCC00%22 font-size=%2214%22 font-family=%22Inter%22>MUST</text></svg>'">
+                </div>
+                <div class="university-info">
+                    <h1>Meru University of Science and Technology</h1>
+                    <p class="tagline"><i class="fas fa-graduation-cap"></i> Department of Physical Sciences</p>
+                     <p class="creator-credit">BY: OKWARA BRIAN (SC201/108185/21) - Bsc Math & Physics Student</p>
+                </div>
+            </div>
+           
+            <div class="experiment-badge">
+                <div style="flex: 1;">
+                    <h3>Experiment A-2: Simple Pendulum</h3>
+                    <p>Virtual Physics Laboratory</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-title">
+        <div class="container">
+            <h2>Virtual Simple Pendulum Laboratory</h2>
+            <p>Select experiment parameters to view corresponding real pendulum videos. Record your observations and measurements in the tables below.</p>
+        </div>
+    </section>
+
+    <!-- Manual Download Section -->
+    <section class="manual-download-section">
+        <div class="container">
+            <div class="manual-download-card">
+                <div class="manual-header">
+                    <div class="manual-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h2 class="manual-title">Download Experiment Manual</h2>
+                </div>
+                
+                <p class="manual-description">
+                    Download the complete laboratory manual for the Simple Pendulum experiment. The manual contains detailed instructions, theoretical background, procedures, and guidelines for data analysis and reporting.
+                </p>
+                
+                <div class="download-btn-container">
+                    <a href="simple/Simple Pendulum.pdf" class="download-btn" download="Simple_Pendulum_Experiment_Manual.pdf">
+                        <i class="fas fa-download"></i>
+                        <span>Download Manual (PDF)</span>
+                    </a>
+                    <!-- Apparatus View Button -->
+                    <button class="download-btn" id="apparatusViewBtn">
+                        <i class="fas fa-microscope"></i>
+                        <span>View Apparatus</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <main class="container">
+        <div class="dashboard">
+            <section class="control-panel">
+                <div class="panel-header">
+                    <h3><i class="fas fa-sliders-h"></i> Experiment Controls</h3>
+                </div>
+
+                <div class="part-selector">
+                    <div class="selector-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h4>Select Experiment Part</h4>
+                    </div>
+                    <div class="part-buttons">
+                        <button class="part-btn active" id="partAbtn">
+                            <i class="fas fa-ruler-vertical"></i>
+                            <span>Part A</span>
+                            <span style="font-size: 0.8rem; opacity: 0.8;">Determine g (vary length)</span>
+                        </button>
+                        <button class="part-btn" id="partBbtn">
+                            <i class="fas fa-angle-right"></i>
+                            <span>Part B</span>
+                            <span style="font-size: 0.8rem; opacity: 0.8;">Effect of Amplitude</span>
+                        </button>
+                        <!-- Added Part C button -->
+                        <button class="part-btn" id="partCbtn">
+                            <i class="fas fa-wave-square"></i>
+                            <span>Part C</span>
+                            <span style="font-size: 0.8rem; opacity: 0.8;">Damping Effect</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="parameter-selector" id="partAParams">
+                    <div class="selector-title">
+                        <i class="fas fa-ruler-combined"></i>
+                        <h4>Select Pendulum Length</h4>
+                    </div>
+                    <p class="selector-description">Each length has a unique experimental Virtualized video. Lengths from 50-100cm with small angle (&lt;10°).</p>
+                    <div class="parameter-grid" id="lengthButtons"></div>
+                </div>
+
+                <div class="parameter-selector" id="partBParams" style="display: none;">
+                    <div class="selector-title">
+                        <i class="fas fa-drafting-compass"></i>
+                        <h4>Select Initial Angle</h4>
+                    </div>
+                    <p class="selector-description">Fixed length = 70cm. Each angle has a unique experimental Virtualized video.</p>
+                    <div class="parameter-grid" id="angleButtons"></div>
+                </div>
+
+
+                <div class="setup-card">
+                    <h4><i class="fas fa-flask"></i> Current Virtualized Setup</h4>
+                    <div class="parameter-display">
+                        <div class="param-display-item">
+                            <div class="param-label">
+                                <i class="fas fa-shapes"></i> Experiment Part
+                            </div>
+                            <div class="param-value" id="currentPart">Part A</div>
+                        </div>
+                        <div class="param-display-item">
+                            <div class="param-label">
+                                <i class="fas fa-ruler-vertical"></i> Length
+                            </div>
+                            <div class="param-value" id="currentLength">50 cm</div>
+                        </div>
+                        <div class="param-display-item">
+                            <div class="param-label">
+                                <i class="fas fa-angle-right"></i> Angle
+                            </div>
+                            <div class="param-value" id="currentAngle">10°</div>
+                        </div>
+                        <div class="param-display-item">
+                            <div class="param-label">
+                                <i class="fas fa-video"></i> Video ID
+                            </div>
+                            <div class="param-value" id="currentVideo">L50-A10</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="video-panel">
+                <div class="video-header">
+                    <h3><i class="fas fa-video"></i> Current Virtualized Video Parameters</h3>
+                    <div class="experiment-indicator" id="experimentTitle">
+                        Part A: Length = 50cm, Angle = 10°
+                    </div>
+                </div>
+                
+                <div class="video-container">
+                    <div class="video-player-container">
+                        <iframe class="video-player" id="experimentVideo"
+                                src="https://www.youtube.com/embed/vlLzSGoXGyQ?rel=0&modestbranding=1"
+                                title="Simple Pendulum Experiment"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    
+                    <div class="video-info">
+                        <h4><i class="fas fa-info-circle"></i> Instructions</h4>
+                        <p>Watch the video carefully. Use YouTube controls to pause, rewind, and analyze the pendulum motion. Time 50 complete oscillations starting from the equilibrium position.</p>
+                        <p>Record your measurements in the data tables below. Each parameter combination has a unique video for accurate observation.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="data-section">
+            <div class="data-header">
+                <h3><i class="fas fa-table"></i> Data Recording</h3>
+                <div class="data-tabs">
+                    <button class="data-tab active" id="table1Tab">Table 1: Length Variation</button>
+                    <button class="data-tab" id="table2Tab">Table 2: Angle Variation</button>
+                    <!-- Added Table 3 for Part C -->
+                    <button class="data-tab" id="table3Tab">Table 3: Damping Study</button>
+                </div>
+            </div>
+            
+            <div class="data-table-container" id="table1Container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Length (m)</th>
+                            <th>Time for 50 Oscillations (s)</th>
+                            <th>Average Time (s)</th>
+                            <th>Period T (s)</th>
+                            <th>T² (s²)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table1Body">
+                        <tr>
+                            <td><input type="text" placeholder="0.50"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s²"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="0.60"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s²"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="0.70"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s²"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="0.80"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s²"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="0.90"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s²"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="1.00"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s²"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="data-table-container" id="table2Container" style="display: none;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Amplitude θ (°)</th>
+                            <th>Time (t) for 50 Oscillations ±... (s)</th>
+                            <th>Average t ±... (s)</th>
+                            <th>Period (T) ± dT (s)</th>
+                            <th>Correction Factor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table2Body">
+                        <tr>
+                            <td><input type="text" placeholder="10"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="15"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="25"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="30"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="35"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="40"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="45"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="50"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="55"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="60"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="65"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="70"></td>
+                            <td><input type="text" placeholder="Set 1: __ s, Set 2: __ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Added Table 3 for Part C -->
+            <div class="data-table-container" id="table3Container" style="display: none;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Cycle Number (n)</th>
+                            <th>Amplitude A<sub>n</sub> (°)</th>
+                            <th>Time for 10 cycles (s)</th>
+                            <th>Period T (s)</th>
+                            <th>Logarithmic Decrement (Λ)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table3Body">
+                        <tr>
+                            <td><input type="text" placeholder="1"></td>
+                            <td><input type="text" placeholder="___ °"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="2"></td>
+                            <td><input type="text" placeholder="___ °"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="3"></td>
+                            <td><input type="text" placeholder="___ °"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="4"></td>
+                            <td><input type="text" placeholder="___ °"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="5"></td>
+                            <td><input type="text" placeholder="___ °"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="6"></td>
+                            <td><input type="text" placeholder="___ °"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="7"></td>
+                            <td><input type="text" placeholder="___ °"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="8"></td>
+                            <td><input type="text" placeholder="___ °"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="9"></td>
+                            <td><input type="text" placeholder="___ °"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="10"></td>
+                            <td><input type="text" placeholder="___ °"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___ s"></td>
+                            <td><input type="text" placeholder="___"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="data-instructions">
+                <h4><i class="fas fa-clipboard-check"></i> Instructions for Students</h4>
+                <ul>
+                    <li>For each parameter combination, watch the video and measure the time for 50 oscillations</li>
+                    <li>Record your measurements in the appropriate table cells</li>
+                    <li>Calculate the period T = (time for 50 oscillations) ÷ 50</li>
+                    <li>Calculate T² for Part A data</li>
+                    <li>For Part C, measure amplitude decay over successive cycles</li>
+                    <li>Include your estimated errors in separate calculations</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="questions-section">
+            <h3 class="questions-header"><i class="fas fa-question-circle"></i> Laboratory Questions</h3>
+            
+            <div class="questions-container">
+                <div class="question-item">
+                    <h4><i class="fas fa-1"></i> Purpose of timing 50 oscillations</h4>
+                    <textarea placeholder="Enter your answer here..."></textarea>
+                </div>
+                
+                <div class="question-item">
+                    <h4><i class="fas fa-2"></i> Why amplitude must be small (&lt;10°)</h4>
+                    <textarea placeholder="Enter your answer here..."></textarea>
+                </div>
+                
+                <div class="question-item">
+                    <h4><i class="fas fa-3"></i> Compare your g value with 9.81 ms⁻²</h4>
+                    <textarea placeholder="Enter your answer here..."></textarea>
+                </div>
+                
+                <div class="question-item">
+                    <h4><i class="fas fa-4"></i> Why T² vs l graph doesn't pass through origin</h4>
+                    <textarea placeholder="Enter your answer here..."></textarea>
+                </div>
+                
+                <div class="question-item">
+                    <h4><i class="fas fa-5"></i> Assumptions of ideal simple pendulum</h4>
+                    <textarea placeholder="Enter your answer here..."></textarea>
+                </div>
+                
+                <div class="question-item">
+                    <h4><i class="fas fa-6"></i> Error calculation problem</h4>
+                    <textarea placeholder="For pendulum (0.600 ± 0.002)m, T = (1.55 ± 0.01)s. Calculate % error in g."></textarea>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Meru University</h4>
+                    <p>Department of Physics</p>
+                    <p>Faculty of Science</p>
+                    <p>P.O. Box 972-60200, Meru</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Virtual Laboratory</h4>
+                    <p>Experiment A-2: Simple Pendulum</p>
+                    <p>Acceleration due to gravity</p>
+                    <p>BSc Physics & Mathematics</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Instructions</h4>
+                    <p>Watch videos carefully</p>
+                    <p>Record all measurements</p>
+                    <p>Answer all questions</p>
+                </div>
+            </div>
+            <div class="copyright">
+                © 2026 Meru University of Science and Technology - Virtual Physics Laboratory
+                <p>Contact info: Email: okwaraabrian@gmail.com<br>
+                Phone: 0704031227, 0114205073</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Apparatus View Modal -->
+    <div class="modal-overlay" id="apparatusModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-microscope"></i> Apparatus Setup</h3>
+                <button class="close-modal" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="apparatus-main-image">
+                    <img src="images2/image2.png" alt="Simple Pendulum Apparatus Setup" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22 viewBox=%220 0 800 600%22><rect width=%22100%%22 height=%22100%%22 fill=%22%23f0f7f3%22/><text x=%22400%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%23006633%22 font-size=%2224%22 font-family=%22Inter%22>Simple Pendulum Apparatus</text></svg>'">
+                </div>
+                
+                <div class="apparatus-components">
+                    <h4><i class="fas fa-tools"></i> Apparatus Components</h4>
+                    <div class="components-grid">
+                        <div class="component-item">
+                            <h5><i class="fas fa-circle"></i> Pendulum Bob</h5>
+                            <p>50g metallic sphere, smooth surface to minimize air resistance</p>
+                        </div>
+                        <div class="component-item">
+                            <h5><i class="fas fa-ruler-vertical"></i> String</h5>
+                            <p>Light, inextensible thread (50-100cm lengths), negligible mass</p>
+                        </div>
+                        <div class="component-item">
+                            <h5><i class="fas fa-archway"></i> Retort Stand</h5>
+                            <p>Heavy base with adjustable clamp for stable suspension point</p>
+                        </div>
+                        <div class="component-item">
+                            <h5><i class="fas fa-drafting-compass"></i> Protractor</h5>
+                            <p>180° scale for measuring initial angles (±1° accuracy)</p>
+                        </div>
+                        <div class="component-item">
+                            <h5><i class="fas fa-stopwatch"></i> Stopwatch</h5>
+                            <p>Digital timer with 0.01s resolution for oscillation timing</p>
+                        </div>
+                        <div class="component-item">
+                            <h5><i class="fas fa-ruler"></i> Meter Rule</h5>
+                            <p>1m ruler with mm markings for length measurement</p>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dashboard state (original, untouched)
+        let currentExperimentPart = 'A';
+        let selectedLength = 50;
+        let selectedAngle = 10;
+        
+        // Experiment parameters
+        const partALengths = [50, 60, 70, 80, 90, 100];
+        const partBAngles = [10, 15, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70];
+        
+        // Video database with added Part C video
+        const videoDatabase = {
+            "50-10": "vlLzSGoXGyQ",
+            "60-10": "EwQ_2Ia8etw",
+            "70-10": "efrQD6q_LCc",
+            "80-10": "GoFWvdnng_k",
+            "90-10": "kffacxfA7G4",
+            "100-10": "C0DPdy98e4c",
+            "70-15": "FTGQo0H5vCk",
+            "70-25": "kipxq3cBHX4",
+            "70-30": "GfP9Xv8u5U8",
+            "70-35": "q8QYJfXlB7s",
+            "70-40": "7XZgvQw3G3U",
+            "70-45": "pU9Q6otQ3h8",
+            "70-50": "w7R0W7f6Y9c",
+            "70-55": "9Rwbg1_XfkE",
+            "70-60": "v2R4k9p7L7c",
+            "70-65": "z9Rwbg1_Xfk",
+            "70-70": "w7R0W7f6Y9d",
+            // Added Part C video (damping effect)
+            "70-15-damping": "dQw4w9WgXcQ" // Replace with actual YouTube ID
+        };
+        
+        const videoCodes = {
+            "50-10": "L50-A10",
+            "60-10": "L60-A10",
+            "70-10": "L70-A10",
+            "80-10": "L80-A10",
+            "90-10": "L90-A10",
+            "100-10": "L100-A10",
+            "70-15": "L70-A15",
+            "70-25": "L70-A25",
+            "70-30": "L70-A30",
+            "70-35": "L70-A35",
+            "70-40": "L70-A40",
+            "70-45": "L70-A45",
+            "70-50": "L70-A50",
+            "70-55": "L70-A55",
+            "70-60": "L70-A60",
+            "70-65": "L70-A65",
+            "70-70": "L70-A70",
+            // Added Part C code
+            "70-15-damping": "L70-A15-DAMP"
+        };
+        
+        // Dashboard Functions (identical, only ensure aspect ratio responsive)
+        function initDashboard() {
+            initPartASelector();
+            initPartBSelector();
+            updateExperimentDisplay();
+            setupEventListeners();
+            setupModalControls();
+        }
+        
+        function initPartASelector() {
+            const container = document.getElementById('lengthButtons');
+            container.innerHTML = '';
+            
+            partALengths.forEach(length => {
+                const button = document.createElement('button');
+                button.className = `param-btn ${length === selectedLength ? 'active' : ''}`;
+                button.textContent = `${length} cm`;
+                button.dataset.length = length;
+                button.addEventListener('click', () => {
+                    selectedLength = length;
+                    selectedAngle = 10;
+                    updateParameterButtons();
+                    updateExperimentDisplay();
+                });
+                container.appendChild(button);
+            });
+        }
+        
+        function initPartBSelector() {
+            const container = document.getElementById('angleButtons');
+            container.innerHTML = '';
+            
+            partBAngles.forEach(angle => {
+                const button = document.createElement('button');
+                button.className = `param-btn ${angle === selectedAngle ? 'active' : ''}`;
+                button.textContent = `${angle}°`;
+                button.dataset.angle = angle;
+                button.addEventListener('click', () => {
+                    selectedLength = 70;
+                    selectedAngle = angle;
+                    updateParameterButtons();
+                    updateExperimentDisplay();
+                });
+                container.appendChild(button);
+            });
+        }
+        
+        function updateParameterButtons() {
+            document.querySelectorAll('#lengthButtons .param-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.length) === selectedLength);
+            });
+            document.querySelectorAll('#angleButtons .param-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.angle) === selectedAngle);
+            });
+            const dampingBtn = document.getElementById('dampingBtn');
+            if (dampingBtn) dampingBtn.classList.toggle('active', currentExperimentPart === 'C');
+        }
+        
+        function updateExperimentDisplay() {
+            const currentPart = document.getElementById('currentPart');
+            const currentLength = document.getElementById('currentLength');
+            const currentAngle = document.getElementById('currentAngle');
+            const currentVideo = document.getElementById('currentVideo');
+            const experimentTitle = document.getElementById('experimentTitle');
+            
+            if (currentPart && currentLength && currentAngle && currentVideo && experimentTitle) {
+                currentPart.textContent = currentExperimentPart === 'A' ? 'Part A' : 
+                                         currentExperimentPart === 'B' ? 'Part B' : 'Part C';
+                
+                if (currentExperimentPart === 'A') {
+                    currentLength.textContent = `${selectedLength} cm`;
+                    currentAngle.textContent = '10°';
+                    experimentTitle.textContent = `Part A: Length = ${selectedLength}cm, Angle = 10°`;
+                } else if (currentExperimentPart === 'B') {
+                    currentLength.textContent = '70 cm';
+                    currentAngle.textContent = `${selectedAngle}°`;
+                    experimentTitle.textContent = `Part B: Length = 70cm, Angle = ${selectedAngle}°`;
+                } else if (currentExperimentPart === 'C') {
+                    currentLength.textContent = '70 cm';
+                    currentAngle.textContent = '15° (damping)';
+                    experimentTitle.textContent = `Part C: Damping Study - Length = 70cm, Angle = 15°`;
+                }
+                
+                const videoKey = getCurrentVideoKey();
+                currentVideo.textContent = videoCodes[videoKey] || "L50-A10";
+                loadExperimentVideo();
+            }
+        }
+        
+        function getCurrentVideoKey() {
+            if (currentExperimentPart === 'A') return `${selectedLength}-10`;
+            else if (currentExperimentPart === 'B') return `70-${selectedAngle}`;
+            else if (currentExperimentPart === 'C') return '70-15-damping';
+            return '50-10';
+        }
+        
+        function loadExperimentVideo() {
+            const videoKey = getCurrentVideoKey();
+            const videoId = videoDatabase[videoKey] || "vlLzSGoXGyQ";
+            const experimentVideo = document.getElementById('experimentVideo');
+            if (experimentVideo) {
+                experimentVideo.src = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
+            }
+        }
+        
+        function setupEventListeners() {
+            const partAbtn = document.getElementById('partAbtn');
+            const partBbtn = document.getElementById('partBbtn');
+            const partCbtn = document.getElementById('partCbtn');
+            const partAParams = document.getElementById('partAParams');
+            const partBParams = document.getElementById('partBParams');
+            const partCParams = document.getElementById('partCParams');
+            
+            if (partAbtn && partBbtn && partCbtn && partAParams && partBParams && partCParams) {
+                partAbtn.addEventListener('click', () => {
+                    currentExperimentPart = 'A';
+                    partAbtn.classList.add('active');
+                    partBbtn.classList.remove('active');
+                    partCbtn.classList.remove('active');
+                    partAParams.style.display = 'block';
+                    partBParams.style.display = 'none';
+                    partCParams.style.display = 'none';
+                    selectedLength = 50; selectedAngle = 10;
+                    updateParameterButtons(); updateExperimentDisplay();
+                });
+                partBbtn.addEventListener('click', () => {
+                    currentExperimentPart = 'B';
+                    partBbtn.classList.add('active');
+                    partAbtn.classList.remove('active');
+                    partCbtn.classList.remove('active');
+                    partAParams.style.display = 'none';
+                    partBParams.style.display = 'block';
+                    partCParams.style.display = 'none';
+                    selectedLength = 70; selectedAngle = 10;
+                    updateParameterButtons(); updateExperimentDisplay();
+                });
+                partCbtn.addEventListener('click', () => {
+                    currentExperimentPart = 'C';
+                    partCbtn.classList.add('active');
+                    partAbtn.classList.remove('active');
+                    partBbtn.classList.remove('active');
+                    partAParams.style.display = 'none';
+                    partBParams.style.display = 'none';
+                    partCParams.style.display = 'block';
+                    selectedLength = 70; selectedAngle = 15;
+                    updateParameterButtons(); updateExperimentDisplay();
+                });
+            }
+            
+            const table1Tab = document.getElementById('table1Tab');
+            const table2Tab = document.getElementById('table2Tab');
+            const table3Tab = document.getElementById('table3Tab');
+            const table1Container = document.getElementById('table1Container');
+            const table2Container = document.getElementById('table2Container');
+            const table3Container = document.getElementById('table3Container');
+            
+            if (table1Tab && table2Tab && table3Tab && table1Container && table2Container && table3Container) {
+                table1Tab.addEventListener('click', () => {
+                    table1Tab.classList.add('active');
+                    table2Tab.classList.remove('active');
+                    table3Tab.classList.remove('active');
+                    table1Container.style.display = 'block';
+                    table2Container.style.display = 'none';
+                    table3Container.style.display = 'none';
+                });
+                table2Tab.addEventListener('click', () => {
+                    table2Tab.classList.add('active');
+                    table1Tab.classList.remove('active');
+                    table3Tab.classList.remove('active');
+                    table1Container.style.display = 'none';
+                    table2Container.style.display = 'block';
+                    table3Container.style.display = 'none';
+                });
+                table3Tab.addEventListener('click', () => {
+                    table3Tab.classList.add('active');
+                    table1Tab.classList.remove('active');
+                    table2Tab.classList.remove('active');
+                    table1Container.style.display = 'none';
+                    table2Container.style.display = 'none';
+                    table3Container.style.display = 'block';
+                });
+            }
+            
+            document.querySelectorAll('.param-btn, .part-btn, .data-tab, .download-btn').forEach(btn => {
+                btn.addEventListener('touchstart', function() { this.style.transform = 'scale(0.98)'; });
+                btn.addEventListener('touchend', function() { this.style.transform = 'scale(1)'; });
+            });
+        }
+        
+        function setupModalControls() {
+            const apparatusBtn = document.getElementById('apparatusViewBtn');
+            const apparatusModal = document.getElementById('apparatusModal');
+            const closeModal = document.getElementById('closeModal');
+            
+            if (apparatusBtn && apparatusModal && closeModal) {
+                apparatusBtn.addEventListener('click', () => {
+                    apparatusModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+                closeModal.addEventListener('click', () => {
+                    apparatusModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+                apparatusModal.addEventListener('click', (e) => {
+                    if (e.target === apparatusModal) {
+                        apparatusModal.classList.remove('active');
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && apparatusModal.classList.contains('active')) {
+                        apparatusModal.classList.remove('active');
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initDashboard();
+            // no style changes, just responsive viewer ready
+        });
+    </script>
+</body>
+</html>
