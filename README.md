@@ -1,45 +1,53 @@
 # Virtual-_lab_simple-pendulum
 Virtualization of simple pendulum experiment for determining acceleration due to gravity, amplitude effect and dumping effect through visualization 
 
-README: Virtual Physics Laboratory (Simple Pendulum)
-Meru University of Science and Technology
-This repository contains the frontend architecture for the Virtual Physics Lab, specifically designed for the Simple Pendulum Experiment. This project is a core component of digital innovation within the Competency-Based Education (CBE) framework, aimed at providing high-fidelity laboratory access through hardware abstraction.
-1. Virtualization vs. Simulation
-Unlike a standard simulation that uses code to approximate physics, this system employs Virtualization:
-•	Apparatus Virtualization: The physical simple pendulum, stopwatch, and meter rule are abstracted into a digital "Virtual Machine" for physics.
-•	Environment Virtualization: The laboratory bench and manual procedures are virtualized into a web-based dashboard, ensuring that the student follows the exact same logical steps as they would in a physical lab.
-•	Deterministic Outcomes: By using high-fidelity demonstrations, the system eliminates the "noise" of software-calculated physics, ensuring students focus on the experimentation process and data analysis.
+This code is for a **Virtual Physics Lab** web application, specifically designed for a **Simple Pendulum Experiment** at Meru University of Science and Technology.
 
-2. Core Modules
-A. Virtual Control Panel
-The "Hypervisor" of the lab. It manages the state of the experiment:
-•	Part Selector: Switches between different experimental configurations (Part A, B, and C).
-•	Parameter Manager: Allows users to configure physical constants (Length, Mass, etc.) which then "boots" the corresponding virtual experiment.
-B. Virtual Observation Deck
-A responsive 16:9 viewport that provides the visual output of the virtualized apparatus. It is designed for maximum clarity and cross-device compatibility.
-C. Interactive Data Layer
-A digital logging system where students record observations.
-•	Real-time Input: Dynamic tables that mirror a physical laboratory notebook.
-•	Tabbed Navigation: Organized sections for different experimental runs to prevent data clutter.
+It is built using **HTML5** and **CSS3** and is designed to be fully responsive (working on mobile, tablets, and desktops).
 
-3. Technical Specifications
-•	UI Framework: Semantic HTML5 and Modular CSS3.
-•	Design System: Meru University Institutional Branding (Green/Gold palette).
-•	Responsiveness: Mobile-first architecture using CSS Grid and Flexbox to ensure the lab is accessible on smartphones, tablets, and desktops.
-•	Optimization: High-performance rendering with a focus on low-latency state changes between experimental parameters.
+---
 
- 4. Installation & Deployment
-This is a standalone web-based virtualization system.
-1.	Clone the repository.
-2.	Open index.html in any modern web browser (Chrome, Firefox, Edge, or Safari).
-3.	Dependencies: No local installation is required. The system pulls icons from FontAwesome and typography from Google Fonts via CDN.
+## ### **Core Components of the Code**
 
-5. Project Context
-•	Developer: Meshack Kiptoo
-•	Project Title: Final Year Capstone – Virtual Laboratory System
-•	Objective: To bridge the gap between theoretical physics and practical learning through ICT integration.
+### **1. Branding and Identity**
+*   **University Theme:** The application uses a custom color palette defined in CSS variables:
+    *   `--mu-primary`: A deep green (#006633).
+    *   `--mu-secondary`: A bright yellow/gold (#FFCC00).
+*   **Creator Credit:** There is a specific section highlighted in yellow to credit the developer/creator.
+*   **Logo Container:** A styled box designed to hold the university logo with a professional border and shadow.
 
-6. License & Usage
-This software is intended for academic use at Meru University of Science and Technology. All institutional branding and experimental protocols are the property of the Department of Physical Sciences. 
-Design Note: The UI uses a custom-built responsive viewer to ensure that the virtualized experiment maintains its aspect ratio regardless of the student's screen size, preserving the integrity of the visual measurements.
+### **2. Laboratory Dashboard**
+The interface is split into two main functional areas:
 
+*   **The Control Panel (Left Side):**
+    *   **Experiment Parts:** Allows users to switch between different sections of the experiment (e.g., Part A, B, or C).
+    *   **Parameter Selector:** Interactive buttons for users to choose variables like the **length of the string** or **mass of the bob**.
+    *   **Setup Card:** A real-time readout displaying the currently selected experiment parameters.
+
+*   **The Video/Simulation Panel (Right Side):**
+    *   **Video Player:** An embedded area (using a 16:9 aspect ratio) intended to show the pendulum simulation or recorded experiment footage.
+    *   **Status Indicator:** Shows which experiment is currently active within the viewer.
+
+### **3. Data Collection System**
+*   **Interactive Data Table:** A robust table where students can manually input their observations.
+*   **Tabbed Navigation:** Users can switch between different data sheets for different parts of the lab.
+*   **Mobile Optimized:** The table is wrapped in a scrollable container to prevent it from breaking the layout on small screens.
+
+---
+
+## ### **Technical Highlights**
+
+| Feature | Implementation |
+| :--- | :--- |
+| **Responsive Design** | Uses **CSS Grid** and **Flexbox** with extensive `@media` queries for mobile compatibility. |
+| **Typography** | Integrates the **Inter** font family via Google Fonts for a modern, clean look. |
+| **Iconography** | Uses **FontAwesome 6.4.0** for intuitive visual cues (e.g., download icons, gear icons). |
+| **UI Polish** | Features glassmorphism effects (`backdrop-filter`), linear gradients, and smooth transitions for a "premium" feel. |
+
+---
+
+## ### **Missing Elements**
+Based on the code provided, this is the **Frontend (UI) only**. To make the lab functional, you would need:
+1.  **JavaScript:** To handle the button clicks, update the "Current Setup" text, and change the video source based on selection.
+2.  **Video Assets:** The `<iframe>` or `<video>` tags would need specific URLs to play the pendulum simulations.
+3.  **PDF/Manual:** The "Download Manual" button is styled but requires a link to an actual file to work.
